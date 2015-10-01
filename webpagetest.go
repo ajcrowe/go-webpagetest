@@ -21,6 +21,7 @@ const (
 	testFinished = "finished"
 	testComplete = "complete"
 	testNotFound = "notfound"
+	testTimedOut = "timeout"
 	testError    = "error"
 	// URL endpoints
 	urlLocations = "getLocations.php"
@@ -31,8 +32,9 @@ const (
 )
 
 var (
-	serverURL       *url.URL
-	pollingInterval time.Duration
+	serverURL            *url.URL
+	pollingInterval      time.Duration
+	maximumMonitorPeriod time.Duration
 	// Valid Connection Profiles
 	connectionProfiles = []string{
 		"DSL",
@@ -46,10 +48,11 @@ var (
 	}
 )
 
-// setup the defaults for WebPageTest server and polling interval
+// setup the defaults for WebPageTest server and polling intervals
 func init() {
 	serverURL, _ = url.Parse(defaultBaseURL)
 	pollingInterval = 60 * time.Second
+	maximumMonitorPeriod = 1800 * time.Second // 30 minutes
 }
 
 // function to set your own private WebPageTest server url
@@ -67,6 +70,12 @@ func SetURL(host string) error {
 // checking test status.
 func SetPollingInterval(period int64) {
 	pollingInterval = time.Duration(period) * time.Second
+}
+
+// function to overwrite the default 600 second maximum period to monitor
+// tests for status changes
+func SetMaximumMonitorPeriod(period int64) {
+	maximumMonitorPeriod = time.Duration(period) * time.Second
 }
 
 type Config struct {
@@ -164,7 +173,7 @@ func (c *Client) query(path string, qs string, respStruct interface{}) error {
 		return errors.New("webpagetest: error ready response body")
 	}
 
-	json.Unmarshal(body, &respStruct)
+	err = json.Unmarshal(body, &respStruct)
 
 	return nil
 }

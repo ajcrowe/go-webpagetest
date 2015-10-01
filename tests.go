@@ -176,12 +176,23 @@ func (t *Test) Run() error {
 // if the status changes it will transfer the new status over the
 // State channel and load the result
 func (t *Test) monitor() {
+	expired := false
+	time.AfterFunc(maximumMonitorPeriod, func() {
+		expired = true
+	})
+
 	var status string
 	for {
+		if expired {
+			t.sendStatus(testTimedOut)
+			break
+		}
 		// sleep for defined interval
 		time.Sleep(pollingInterval)
+		// get latest status
+		status = t.CheckStatus()
 		// only send update if status has changed
-		if t.Status != t.CheckStatus() {
+		if t.Status != status {
 			// send status over the status channel
 			t.sendStatus(status)
 			// if test has finished call function to load results
@@ -193,6 +204,7 @@ func (t *Test) monitor() {
 					t.sendStatus(testComplete)
 				}
 				close(t.StatusChan)
+				break
 			}
 		}
 	}
