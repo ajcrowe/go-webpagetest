@@ -92,9 +92,10 @@ type RunThumbnails struct {
 	ScreenShot string `json:"screenShot"`
 }
 type RunImages struct {
-	Waterfall  string `json:"waterfall"`
-	Checklist  string `json:"checklist"`
-	ScreenShot string `json:"screenShot"`
+	Waterfall     string `json:"waterfall"`
+	Checklist     string `json:"checklist"`
+	ScreenShot    string `json:"screenShot"`
+	ScreenShotPNG string `json:"screenShotPng"`
 }
 type RunRawData struct {
 	Headers      string `json:"headers"`
