@@ -292,8 +292,8 @@ func (tp *TestParams) getQueryString() string {
 
 type Timestamp time.Time
 
-func (t *Timestamp) MarshalJSON() ([]byte, error) {
-	ts := time.Time(*t).Unix()
+func (t Timestamp) MarshalJSON() ([]byte, error) {
+	ts := time.Time(t).Unix()
 	stamp := fmt.Sprint(ts)
 	return []byte(stamp), nil
 }
