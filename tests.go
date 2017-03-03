@@ -3,10 +3,11 @@ package wpt
 import (
 	"errors"
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/go-querystring/query"
 )
 
 type Test struct {
@@ -156,15 +157,18 @@ func (t *Test) Run() error {
 	err := t.Client.query(urlRunTest, t.Params.getQueryString(), &t.Response)
 	if err != nil {
 		go t.sendStatus(testFailed)
+		t.Status = testFailed
 		return err
 	}
 	if t.Response.StatusCode != 200 {
 		go t.sendStatus(testFailed)
+		t.Status = testFailed
 		return errors.New(fmt.Sprintf("webpagetest: bad status code %s when submitting test", t.Response.StatusCode))
 	}
 	// update the Test struct
 	t.RequestID = t.Response.Data.TestId
 	go t.sendStatus(testQueued)
+	t.Status = testQueued
 	// call the monitor if set in test to update the Test
 	if t.Monitor {
 		go t.monitor()
@@ -185,6 +189,7 @@ func (t *Test) monitor() {
 	for {
 		if expired {
 			t.sendStatus(testTimedOut)
+			t.Status = testTimedOut
 			break
 		}
 		// sleep for defined interval
@@ -195,13 +200,16 @@ func (t *Test) monitor() {
 		if t.Status != status {
 			// send status over the status channel
 			t.sendStatus(status)
+			t.Status = status
 			// if test has finished call function to load results
 			if status == testFinished {
 				err := t.LoadResults()
 				if err != nil {
 					t.sendStatus(testFailed)
+					t.Status = testFailed
 				} else {
 					t.sendStatus(testComplete)
+					t.Status = testComplete
 				}
 				close(t.StatusChan)
 				break
@@ -247,7 +255,6 @@ func (t *Test) LoadResults() error {
 
 func (t *Test) sendStatus(state string) {
 	t.StatusChan <- state
-	t.Status = state
 }
 
 // this validates various options present against know valid inputs
