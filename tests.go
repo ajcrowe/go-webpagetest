@@ -188,6 +188,7 @@ func (t *Test) monitor() {
 		case <-expired:
 			t.sendStatus(testTimedOut)
 			t.Status = testTimedOut
+			return
 		default:
 			// sleep for defined interval
 			time.Sleep(pollingInterval)
@@ -209,7 +210,7 @@ func (t *Test) monitor() {
 						t.Status = testComplete
 					}
 					close(t.StatusChan)
-					break
+					return
 				}
 			}
 		}
