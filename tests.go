@@ -180,39 +180,37 @@ func (t *Test) Run() error {
 // if the status changes it will transfer the new status over the
 // State channel and load the result
 func (t *Test) monitor() {
-	expired := false
-	time.AfterFunc(maximumMonitorPeriod, func() {
-		expired = true
-	})
+	expired := time.After(maximumMonitorPeriod)
 
 	var status string
 	for {
-		if expired {
+		select {
+		case <-expired:
 			t.sendStatus(testTimedOut)
 			t.Status = testTimedOut
-			break
-		}
-		// sleep for defined interval
-		time.Sleep(pollingInterval)
-		// get latest status
-		status = t.CheckStatus()
-		// only send update if status has changed
-		if t.Status != status {
-			// send status over the status channel
-			t.sendStatus(status)
-			t.Status = status
-			// if test has finished call function to load results
-			if status == testFinished {
-				err := t.LoadResults()
-				if err != nil {
-					t.sendStatus(testFailed)
-					t.Status = testFailed
-				} else {
-					t.sendStatus(testComplete)
-					t.Status = testComplete
+		default:
+			// sleep for defined interval
+			time.Sleep(pollingInterval)
+			// get latest status
+			status = t.CheckStatus()
+			// only send update if status has changed
+			if t.Status != status {
+				// send status over the status channel
+				t.sendStatus(status)
+				t.Status = status
+				// if test has finished call function to load results
+				if status == testFinished {
+					err := t.LoadResults()
+					if err != nil {
+						t.sendStatus(testFailed)
+						t.Status = testFailed
+					} else {
+						t.sendStatus(testComplete)
+						t.Status = testComplete
+					}
+					close(t.StatusChan)
+					break
 				}
-				close(t.StatusChan)
-				break
 			}
 		}
 	}
