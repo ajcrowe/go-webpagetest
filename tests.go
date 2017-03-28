@@ -181,6 +181,7 @@ func (t *Test) Run() error {
 // State channel and load the result
 func (t *Test) monitor() {
 	expired := time.After(maximumMonitorPeriod)
+	defer close(t.StatusChan)
 
 	var status string
 	for {
@@ -209,7 +210,6 @@ func (t *Test) monitor() {
 						t.sendStatus(testComplete)
 						t.Status = testComplete
 					}
-					close(t.StatusChan)
 					return
 				}
 			}
