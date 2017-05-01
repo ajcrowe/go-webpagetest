@@ -5,21 +5,21 @@ go-webpagetest is a simple library to interface with the [WebPageTest](http://ww
 
 [![GoDoc](https://godoc.org/github.com/ajcrowe/go-webpagetest?status.svg)](https://godoc.org/github.com/ajcrowe/go-webpagetest)
 
-##features
+## Features
 
 *	
-	###Tests
+	### Tests
 	* create tests and submit them to a webpagetest instance
 	* poll tests as they run and have the results automatically unmarshalled to the Test struct
 	* retrieve historic test results from the API by Request ID
 
 * 	
-	###Locations
+	### Locations
 	* list available test locations
 	* get the default location tests are run
 
 
-##install
+## Install
 
 You can install this library with `go get`
 
@@ -34,7 +34,7 @@ import (
 )
 ```
 
-##examples
+## Examples
 
 You can find some examples in the `examples` folder for usage
 
