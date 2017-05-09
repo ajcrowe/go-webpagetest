@@ -248,14 +248,12 @@ func (t *Test) LoadResults() error {
 }
 
 func (t *Test) setStatus(state string) {
-	t.Status = state
-	go func() {
-		// There's no guarantee this channel hasn't already been closed elsewhere.
-		defer func() {
-			recover()
-		}()
+	select {
+	case t.StatusChan <- state:
+	case <-t.StatusChan:
 		t.StatusChan <- state
-	}()
+	}
+	t.Status = state
 }
 
 // this validates various options present against know valid inputs
