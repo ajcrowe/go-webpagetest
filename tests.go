@@ -196,7 +196,7 @@ func (t *Test) monitor() {
 				// send status over the status channel
 				t.setStatus(status)
 				// if test has finished call function to load results
-				if status == testFinished {
+				if status == testFinished || status == testNotFound || status == testCancelled {
 					err := t.LoadResults()
 					if err != nil {
 						t.setStatus(testFailed)
@@ -228,6 +228,8 @@ func (t *Test) CheckStatus() string {
 		return testFinished
 	case status.StatusCode == 400:
 		return testNotFound
+	case status.StatusCode == 402:
+		return testCancelled
 	default:
 		fmt.Printf("webpagetest: unknown status code %d returned for test %s\n", status.StatusCode, t.RequestID)
 		return testError
