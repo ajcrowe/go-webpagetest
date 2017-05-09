@@ -156,18 +156,15 @@ func (t *Test) Run() error {
 	// send the request to webpagetest
 	err := t.Client.query(urlRunTest, t.Params.getQueryString(), &t.Response)
 	if err != nil {
-		go t.sendStatus(testFailed)
-		t.Status = testFailed
+		t.setStatus(testFailed)
 		return err
 	}
 	if t.Response.StatusCode != 200 {
-		go t.sendStatus(testFailed)
-		t.Status = testFailed
-		return errors.New(fmt.Sprintf("webpagetest: bad status code %s when submitting test", t.Response.StatusCode))
+		t.setStatus(testFailed)
+		return errors.New(fmt.Sprintf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode))
 	}
 	// update the Test struct
 	t.RequestID = t.Response.Data.TestId
-	go t.sendStatus(testQueued)
 	t.Status = testQueued
 	// call the monitor if set in test to update the Test
 	if t.Monitor {
@@ -187,8 +184,7 @@ func (t *Test) monitor() {
 	for {
 		select {
 		case <-expired:
-			t.sendStatus(testTimedOut)
-			t.Status = testTimedOut
+			t.setStatus(testTimedOut)
 			return
 		default:
 			// sleep for defined interval
@@ -198,17 +194,14 @@ func (t *Test) monitor() {
 			// only send update if status has changed
 			if t.Status != status {
 				// send status over the status channel
-				t.sendStatus(status)
-				t.Status = status
+				t.setStatus(status)
 				// if test has finished call function to load results
 				if status == testFinished {
 					err := t.LoadResults()
 					if err != nil {
-						t.sendStatus(testFailed)
-						t.Status = testFailed
+						t.setStatus(testFailed)
 					} else {
-						t.sendStatus(testComplete)
-						t.Status = testComplete
+						t.setStatus(testComplete)
 					}
 					return
 				}
@@ -252,8 +245,11 @@ func (t *Test) LoadResults() error {
 
 }
 
-func (t *Test) sendStatus(state string) {
-	t.StatusChan <- state
+func (t *Test) setStatus(state string) {
+	t.Status = state
+	go func() {
+		t.StatusChan <- state
+	}()
 }
 
 // this validates various options present against know valid inputs
