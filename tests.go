@@ -3,10 +3,11 @@ package wpt
 import (
 	"errors"
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/go-querystring/query"
 )
 
 type Test struct {
@@ -155,16 +156,16 @@ func (t *Test) Run() error {
 	// send the request to webpagetest
 	err := t.Client.query(urlRunTest, t.Params.getQueryString(), &t.Response)
 	if err != nil {
-		go t.sendStatus(testFailed)
+		t.setStatus(testFailed)
 		return err
 	}
 	if t.Response.StatusCode != 200 {
-		go t.sendStatus(testFailed)
-		return errors.New(fmt.Sprintf("webpagetest: bad status code %s when submitting test", t.Response.StatusCode))
+		t.setStatus(testFailed)
+		return errors.New(fmt.Sprintf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode))
 	}
 	// update the Test struct
 	t.RequestID = t.Response.Data.TestId
-	go t.sendStatus(testQueued)
+	t.Status = testQueued
 	// call the monitor if set in test to update the Test
 	if t.Monitor {
 		go t.monitor()
@@ -176,35 +177,34 @@ func (t *Test) Run() error {
 // if the status changes it will transfer the new status over the
 // State channel and load the result
 func (t *Test) monitor() {
-	expired := false
-	time.AfterFunc(maximumMonitorPeriod, func() {
-		expired = true
-	})
+	expired := time.After(maximumMonitorPeriod)
+	defer close(t.StatusChan)
 
 	var status string
 	for {
-		if expired {
-			t.sendStatus(testTimedOut)
-			break
-		}
-		// sleep for defined interval
-		time.Sleep(pollingInterval)
-		// get latest status
-		status = t.CheckStatus()
-		// only send update if status has changed
-		if t.Status != status {
-			// send status over the status channel
-			t.sendStatus(status)
-			// if test has finished call function to load results
-			if status == testFinished {
-				err := t.LoadResults()
-				if err != nil {
-					t.sendStatus(testFailed)
-				} else {
-					t.sendStatus(testComplete)
+		select {
+		case <-expired:
+			t.setStatus(testTimedOut)
+			return
+		default:
+			// sleep for defined interval
+			time.Sleep(pollingInterval)
+			// get latest status
+			status = t.CheckStatus()
+			// only send update if status has changed
+			if t.Status != status {
+				// send status over the status channel
+				t.setStatus(status)
+				// if test has finished call function to load results
+				if status == testFinished || status == testNotFound || status == testCancelled {
+					err := t.LoadResults()
+					if err != nil {
+						t.setStatus(testFailed)
+					} else {
+						t.setStatus(testComplete)
+					}
+					return
 				}
-				close(t.StatusChan)
-				break
 			}
 		}
 	}
@@ -228,6 +228,8 @@ func (t *Test) CheckStatus() string {
 		return testFinished
 	case status.StatusCode == 400:
 		return testNotFound
+	case status.StatusCode == 402:
+		return testCancelled
 	default:
 		fmt.Printf("webpagetest: unknown status code %d returned for test %s\n", status.StatusCode, t.RequestID)
 		return testError
@@ -245,8 +247,12 @@ func (t *Test) LoadResults() error {
 
 }
 
-func (t *Test) sendStatus(state string) {
-	t.StatusChan <- state
+func (t *Test) setStatus(state string) {
+	select {
+	case t.StatusChan <- state:
+	case <-t.StatusChan:
+		t.StatusChan <- state
+	}
 	t.Status = state
 }
 
