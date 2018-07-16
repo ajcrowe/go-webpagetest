@@ -129,9 +129,10 @@ type TestResults struct {
 		BWUp             int            `json:"bwUp"`
 		Latency          int            `json:"latency"`
 		PackLossRate     string         `json:"plr"`
+		Mobile           int            `json:"mobile"`
+		Label            string         `json:"label"`
 		Completed        Timestamp      `json:"completed"`
 		Tester           string         `json:"tester"`
-		TesterDNS        string         `json:"testerDNS"`
 		FVOnly           bool           `json:"fvonly"`
 		SuccessfulFVRuns int            `json:"successfulFVRuns"`
 		SuccessfulRVRuns int            `json:"successfulRVRuns"`
