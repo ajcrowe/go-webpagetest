@@ -21,14 +21,18 @@ type Test struct {
 	Params     *TestParams
 }
 
+// These params are defined at
+// https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
 type TestParams struct {
 	URL    string `url:"url"`
 	APIKey string `url:"k,omitempty"`
 	Label  string `url:"label,omitempty"`
+
 	// locations and connectivity are combined at validation into LocationString
 	Location       string `url:"-"`
 	Connectivity   string `url:"-"`
 	LocationString string `url:"location,omitempty"`
+
 	// Block string array is converted to a space delimited string at validation
 	Block       []string `url:"-"`
 	BlockString string   `url:"block,omitempty"`
@@ -53,6 +57,7 @@ type TestParams struct {
 	Latency       int    `url:"latency,omitempty"`
 	PackLossRate  int    `url:"plr,omitempty"`
 	IQ            int    `url:"iq,omitempty"`
+
 	// these are integer representations of any booleans
 	FVOnly     int `url:"fvonly,omitempty"`
 	Private    int `url:"private,omitempty"`
@@ -163,13 +168,16 @@ func (t *Test) Run() error {
 		t.setStatus(testFailed)
 		return errors.New(fmt.Sprintf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode))
 	}
+
 	// update the Test struct
 	t.RequestID = t.Response.Data.TestId
 	t.Status = testQueued
+
 	// call the monitor if set in test to update the Test
 	if t.Monitor {
 		go t.monitor()
 	}
+
 	return nil
 }
 
