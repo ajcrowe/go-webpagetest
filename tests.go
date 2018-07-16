@@ -168,7 +168,7 @@ func (t *Test) Run() error {
 	}
 	if t.Response.StatusCode != 200 {
 		t.setStatus(testFailed)
-		return errors.New(fmt.Sprintf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode))
+		return fmt.Errorf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode)
 	}
 
 	// update the Test struct
@@ -251,7 +251,7 @@ func (t *Test) LoadResults() error {
 	qs := fmt.Sprintf("test=%s", t.RequestID)
 	err := t.Client.query(urlResults, qs, &t.Results)
 	if err != nil {
-		return errors.New(fmt.Sprintf("webpagetest: error loading results for test: %s", t.RequestID))
+		return fmt.Errorf("webpagetest: error loading results for test: %s", t.RequestID)
 	}
 	return nil
 
@@ -284,15 +284,14 @@ func (tp *TestParams) Validate() error {
 			}
 		}
 		if !found {
-			return errors.New(fmt.Sprintf("webpagetest: invalid connection profile %s", tp.Connectivity))
+			return fmt.Errorf("webpagetest: invalid connection profile %s", tp.Connectivity)
 		}
 		// if custom is specified check that the bandwidth params are set
 		if (tp.Connectivity == "custom") && ((tp.BWDown == 0) || (tp.BWUp == 0)) {
 			return errors.New("webpagetest: you must set BWUp & BWDown to use custom connectivity")
 		}
-		//
-		tp.LocationString = fmt.Sprintf("%s.%s", tp.Location, tp.Connectivity)
 
+		tp.LocationString = fmt.Sprintf("%s.%s", tp.Location, tp.Connectivity)
 	}
 	// block set convert string array to space delimited string
 	if tp.Block != nil {
