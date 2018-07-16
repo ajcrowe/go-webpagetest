@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -87,6 +88,8 @@ type Config struct {
 	// Timeout for all http requests
 	// if not specified this defaults to 0 and requests will not timeout
 	Timeout time.Duration
+	// Debug prints out all requests made to WPT.
+	Debug bool
 }
 
 type Client struct {
@@ -95,6 +98,9 @@ type Client struct {
 	URL        url.URL
 	APIKey     string
 	HTTPClient *http.Client
+
+	// Debug prints out all requests made to WPT.
+	Debug bool
 }
 
 // NewClient parses the provided Config and returns a Client struct pointer
@@ -112,6 +118,9 @@ func NewClient(c Config) (*Client, error) {
 	client := Client{
 		URL:        *u,
 		HTTPClient: &http.Client{Timeout: c.Timeout},
+
+		// Defaults to false
+		Debug: c.Debug,
 	}
 
 	return &client, nil
@@ -172,6 +181,10 @@ func (c *Client) query(path string, qs string, respStruct interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return errors.New("webpagetest: error ready response body")
+	}
+
+	if c.Debug {
+		log.Printf("WPT Debug Request: %s %s %s", path, qs, body)
 	}
 
 	err = json.Unmarshal(body, &respStruct)
