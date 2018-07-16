@@ -75,6 +75,7 @@ type TestParams struct {
 	HTMLBody   int `url:"htmlbody,omitempty"`
 	Timeline   int `url:"timeline,omitempty"`
 	IgnoreSSL  int `url:"ignoreSSL,omitempty"`
+	Lighthouse int `url:"lighthouse,omitempty"`
 }
 
 type TestRequest struct {
