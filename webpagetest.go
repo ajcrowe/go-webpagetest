@@ -152,8 +152,8 @@ func (c *Client) GetResults(id string) (results TestResults, err error) {
 		fmt.Printf("webpagetest: error loading results for test: %s", id)
 		return TestResults{}, err
 	}
-	return results, nil
 
+	return results, nil
 }
 
 // query takes a given path and query string and calls the WPT host. The response is
@@ -189,5 +189,5 @@ func (c *Client) query(path string, qs string, respStruct interface{}) error {
 
 	err = json.Unmarshal(body, &respStruct)
 
-	return nil
+	return err
 }
