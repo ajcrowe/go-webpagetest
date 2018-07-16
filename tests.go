@@ -313,10 +313,13 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 func (t *Timestamp) UnmarshalJSON(b []byte) error {
-	ts, err := strconv.Atoi(string(b))
+	pieces := strings.Split(string(b), ".")
+	ts, err := strconv.ParseInt(pieces[0], 10, 64)
+	ns, err := strconv.ParseInt(pieces[0], 10, 64)
 	if err != nil {
 		return err
 	}
-	*t = Timestamp(time.Unix(int64(ts), 0))
+
+	*t = Timestamp(time.Unix(ts, ns))
 	return nil
 }

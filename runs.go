@@ -61,8 +61,8 @@ type RunResult struct {
 	FirstPaint                 float64       `json:"firstPaint"`
 	DocCPUMS                   float64       `json:"docCPUms"`
 	FullyLoadedCPUMS           float64       `json:"fullyLoadedCPUms"`
-	DocCPUPCT                  int           `json:"docCPUpct"`
-	FullyLoadedDocCPUPCT       int           `json:"fullyLoadedCPUpct"`
+	DocCPUPCT                  float64       `json:"docCPUpct"`
+	FullyLoadedDocCPUPCT       float64       `json:"fullyLoadedCPUpct"`
 	IsResponsive               int           `json:"isResponsive"`
 	Date                       Timestamp     `json:"date"`
 	SpeedIndex                 float64       `json:"SpeedIndex"`
