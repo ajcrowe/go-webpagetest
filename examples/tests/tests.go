@@ -38,8 +38,8 @@ func main() {
 		}
 		fmt.Println("---")
 		fmt.Printf("wpt-example: Test:\t%s\n", test.RequestID)
-		fmt.Printf("wpt-example: Load-time:\t%d\nms", test.Results.Data.Average.FirstView.LoadTime)
-		fmt.Printf("wpt-example: TTFB:\t%d\nms", test.Results.Data.Average.FirstView.TTFB)
+		fmt.Printf("wpt-example: Load-time:\t%f\nms", test.Results.Data.Average.FirstView.LoadTime)
+		fmt.Printf("wpt-example: TTFB:\t%f\nms", test.Results.Data.Average.FirstView.TTFB)
 	}
 
 }

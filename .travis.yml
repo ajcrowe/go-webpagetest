@@ -1,0 +1,16 @@
+language: go
+
+go:
+  - "1.x"
+
+before_script:
+  - go get github.com/golang/lint/golint
+  - go get honnef.co/go/tools/cmd/megacheck
+  - go get github.com/fzipp/gocyclo
+
+
+script:
+  - go test -v -race -cover ./...
+  - go vet ./...
+  - megacheck ./...
+  - golint -set_exit_status

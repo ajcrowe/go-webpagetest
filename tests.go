@@ -21,14 +21,18 @@ type Test struct {
 	Params     *TestParams
 }
 
+// These params are defined at
+// https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
 type TestParams struct {
 	URL    string `url:"url"`
 	APIKey string `url:"k,omitempty"`
 	Label  string `url:"label,omitempty"`
+
 	// locations and connectivity are combined at validation into LocationString
 	Location       string `url:"-"`
 	Connectivity   string `url:"-"`
 	LocationString string `url:"location,omitempty"`
+
 	// Block string array is converted to a space delimited string at validation
 	Block       []string `url:"-"`
 	BlockString string   `url:"block,omitempty"`
@@ -53,6 +57,7 @@ type TestParams struct {
 	Latency       int    `url:"latency,omitempty"`
 	PackLossRate  int    `url:"plr,omitempty"`
 	IQ            int    `url:"iq,omitempty"`
+
 	// these are integer representations of any booleans
 	FVOnly     int `url:"fvonly,omitempty"`
 	Private    int `url:"private,omitempty"`
@@ -70,6 +75,7 @@ type TestParams struct {
 	HTMLBody   int `url:"htmlbody,omitempty"`
 	Timeline   int `url:"timeline,omitempty"`
 	IgnoreSSL  int `url:"ignoreSSL,omitempty"`
+	Lighthouse int `url:"lighthouse,omitempty"`
 }
 
 type TestRequest struct {
@@ -123,9 +129,10 @@ type TestResults struct {
 		BWUp             int            `json:"bwUp"`
 		Latency          int            `json:"latency"`
 		PackLossRate     string         `json:"plr"`
+		Mobile           int            `json:"mobile"`
+		Label            string         `json:"label"`
 		Completed        Timestamp      `json:"completed"`
 		Tester           string         `json:"tester"`
-		TesterDNS        string         `json:"testerDNS"`
 		FVOnly           bool           `json:"fvonly"`
 		SuccessfulFVRuns int            `json:"successfulFVRuns"`
 		SuccessfulRVRuns int            `json:"successfulRVRuns"`
@@ -161,15 +168,18 @@ func (t *Test) Run() error {
 	}
 	if t.Response.StatusCode != 200 {
 		t.setStatus(testFailed)
-		return errors.New(fmt.Sprintf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode))
+		return fmt.Errorf("webpagetest: bad status code %v when submitting test", t.Response.StatusCode)
 	}
+
 	// update the Test struct
 	t.RequestID = t.Response.Data.TestId
 	t.Status = testQueued
+
 	// call the monitor if set in test to update the Test
 	if t.Monitor {
 		go t.monitor()
 	}
+
 	return nil
 }
 
@@ -241,7 +251,7 @@ func (t *Test) LoadResults() error {
 	qs := fmt.Sprintf("test=%s", t.RequestID)
 	err := t.Client.query(urlResults, qs, &t.Results)
 	if err != nil {
-		return errors.New(fmt.Sprintf("webpagetest: error loading results for test: %s", t.RequestID))
+		return fmt.Errorf("webpagetest: error loading results for test: %s", t.RequestID)
 	}
 	return nil
 
@@ -274,15 +284,14 @@ func (tp *TestParams) Validate() error {
 			}
 		}
 		if !found {
-			return errors.New(fmt.Sprintf("webpagetest: invalid connection profile %s", tp.Connectivity))
+			return fmt.Errorf("webpagetest: invalid connection profile %s", tp.Connectivity)
 		}
 		// if custom is specified check that the bandwidth params are set
 		if (tp.Connectivity == "custom") && ((tp.BWDown == 0) || (tp.BWUp == 0)) {
 			return errors.New("webpagetest: you must set BWUp & BWDown to use custom connectivity")
 		}
-		//
-		tp.LocationString = fmt.Sprintf("%s.%s", tp.Location, tp.Connectivity)
 
+		tp.LocationString = fmt.Sprintf("%s.%s", tp.Location, tp.Connectivity)
 	}
 	// block set convert string array to space delimited string
 	if tp.Block != nil {
@@ -304,10 +313,13 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 func (t *Timestamp) UnmarshalJSON(b []byte) error {
-	ts, err := strconv.Atoi(string(b))
+	pieces := strings.Split(string(b), ".")
+	ts, err := strconv.ParseInt(pieces[0], 10, 64)
+	ns, err := strconv.ParseInt(pieces[0], 10, 64)
 	if err != nil {
 		return err
 	}
-	*t = Timestamp(time.Unix(int64(ts), 0))
+
+	*t = Timestamp(time.Unix(ts, ns))
 	return nil
 }

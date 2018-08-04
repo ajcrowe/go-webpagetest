@@ -61,8 +61,8 @@ type RunResult struct {
 	FirstPaint                 float64       `json:"firstPaint"`
 	DocCPUMS                   float64       `json:"docCPUms"`
 	FullyLoadedCPUMS           float64       `json:"fullyLoadedCPUms"`
-	DocCPUPCT                  int           `json:"docCPUpct"`
-	FullyLoadedDocCPUPCT       int           `json:"fullyLoadedCPUpct"`
+	DocCPUPCT                  float64       `json:"docCPUpct"`
+	FullyLoadedDocCPUPCT       float64       `json:"fullyLoadedCPUpct"`
 	IsResponsive               int           `json:"isResponsive"`
 	Date                       Timestamp     `json:"date"`
 	SpeedIndex                 float64       `json:"SpeedIndex"`
@@ -74,7 +74,8 @@ type RunResult struct {
 	AvgRun                     int           `json:"avgRun"`
 	Pages                      RunPages      `json:"pages"`
 	Thumbnails                 RunThumbnails `json:"thumbnails"`
-	Images                     RunImages     `json:"images"`
+	Artifacts                  RunImages     `json:"images"`
+	Images                     string        `json:"Images"`
 	RawData                    RunRawData    `json:"rawData"`
 }
 
@@ -92,10 +93,11 @@ type RunThumbnails struct {
 	ScreenShot string `json:"screenShot"`
 }
 type RunImages struct {
-	Waterfall     string `json:"waterfall"`
-	Checklist     string `json:"checklist"`
-	ScreenShot    string `json:"screenShot"`
-	ScreenShotPNG string `json:"screenShotPng"`
+	Checklist      string `json:"checklist"`
+	ConnectionView string `json:"connectionView"`
+	ScreenShot     string `json:"screenShot"`
+	ScreenShotPNG  string `json:"screenShotPng"`
+	Waterfall      string `json:"waterfall"`
 }
 type RunRawData struct {
 	Headers      string `json:"headers"`
