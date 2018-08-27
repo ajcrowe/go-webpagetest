@@ -15,7 +15,7 @@ type RunResult struct {
 	BytesOutDoc                float64       `json:"bytesOutDoc"`
 	BytesIn                    float64       `json:"bytesIn"`
 	BytesInDoc                 float64       `json:"bytesInDoc"`
-	Connections                int           `json:"connections"`
+	Connections                float64       `json:"connections"`
 	Requests                   interface{}   `json:"requests"`
 	RequestsDoc                int           `json:"requestsDoc"`
 	Responses200               int           `json:"responses_200"`
