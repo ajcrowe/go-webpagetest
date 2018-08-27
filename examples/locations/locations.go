@@ -6,10 +6,7 @@ import (
 )
 
 func main() {
-	config := wpt.Config{
-		Host:   "https://www.webpagetest.org",
-		APIKey: "xxxxxxxxxxxxx",
-	}
+	config := wpt.NewDefaultConfig()
 
 	client, _ := wpt.NewClient(config)
 
