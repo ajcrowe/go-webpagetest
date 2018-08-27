@@ -1,10 +1,12 @@
 package wpt
 
+// Run represents the results of a run(s) performed by WPT
 type Run struct {
 	FirstView  RunResult `json:"firstView"`
 	RepeatView RunResult `json:"repeatView"`
 }
 
+// RunResult represents a single run and all the collected results
 type RunResult struct {
 	URL                        string        `json:"URL"`
 	LoadTime                   float64       `json:"loadTime"`
@@ -79,6 +81,7 @@ type RunResult struct {
 	RawData                    RunRawData    `json:"rawData"`
 }
 
+// RunPages represents the URLs for viewing the run data through the web interface
 type RunPages struct {
 	Details    string `json:"details"`
 	Checklist  string `json:"checklist"`
@@ -87,11 +90,15 @@ type RunPages struct {
 	Domains    string `json:"domains"`
 	ScreenShot string `json:"screenShot"`
 }
+
+// RunThumbnails represents the URLs for thumbnail images for the run
 type RunThumbnails struct {
 	Waterfall  string `json:"waterfall"`
 	Checklist  string `json:"checklist"`
 	ScreenShot string `json:"screenShot"`
 }
+
+// RunImages represents the URLs for viewing images related to the run
 type RunImages struct {
 	Checklist      string `json:"checklist"`
 	ConnectionView string `json:"connectionView"`
@@ -99,12 +106,10 @@ type RunImages struct {
 	ScreenShotPNG  string `json:"screenShotPng"`
 	Waterfall      string `json:"waterfall"`
 }
+
+// RunRawData represents URLs for raw data on the run
 type RunRawData struct {
 	Headers      string `json:"headers"`
 	PageData     string `json:"pageData"`
 	RequestsData string `json:"requestsData"`
-}
-
-type RunRequest struct {
-	// todo
 }

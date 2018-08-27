@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// Test represents a test within WPT
 type Test struct {
 	RequestID  string
 	StatusChan chan string
@@ -21,7 +22,8 @@ type Test struct {
 	Params     *TestParams
 }
 
-// These params are defined at
+// TestParams represents all the params available for performing tests
+// reference for these params can be found at the following link
 // https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
 type TestParams struct {
 	URL    string `url:"url"`
@@ -78,31 +80,33 @@ type TestParams struct {
 	Lighthouse int `url:"lighthouse,omitempty"`
 }
 
+// TestRequest represents the test request
 type TestRequest struct {
 	StatusCode int    `json:"statusCode"`
 	StatusText string `json:"statusText"`
 	Data       struct {
-		TestId     string `json:"testId"`
+		TestID     string `json:"testId"`
 		OwnerKey   string `json:"ownerKey"`
-		JSONUrl    string `json:"jsonUrl"`
+		JSONURL    string `json:"jsonUrl"`
 		XMLUrl     string `json:"xmlUrl"`
-		UserUrl    string `json:"userUrl"`
+		UserURL    string `json:"userUrl"`
 		SummaryCSV string `json:"summaryCSV"`
 		DetailCSV  string `json:"detailCSV"`
 	} `json:"data"`
 }
 
+// TestStatus represents the state of a specific test within WPT
 type TestStatus struct {
 	StatusCode int    `json:"statusCode"`
 	StatusText string `json:"statusText"`
-	Id         string `json:"id"`
+	ID         string `json:"id"`
 	Data       struct {
 		StatusCode int        `json:"statusCode"`
 		StatusText string     `json:"statusText"`
-		Id         string     `json:"id"`
+		ID         string     `json:"id"`
 		TestInfo   TestParams `json:"testInfo"`
 	} `json:"data"`
-	TestId          string `json:"testId"`
+	TestID          string `json:"testId"`
 	Runs            int    `json:"runs"`
 	FVOnly          int    `json:"fvonly"`
 	Remote          bool   `json:"remote"`
@@ -114,11 +118,12 @@ type TestStatus struct {
 	RVRunsCompleted int    `json:"rvRunsCompleted"`
 }
 
+// TestResults represents the completed test and associated data
 type TestResults struct {
 	StatusCode int    `json:"statusCode"`
 	StatusText string `json:"statusText"`
 	Data       struct {
-		Id               string         `json:"id"`
+		ID               string         `json:"id"`
 		URL              string         `json:"url"`
 		Summary          string         `json:"summary"`
 		TestURL          string         `json:"testUrl"`
@@ -158,6 +163,7 @@ func NewTest(tp *TestParams, c *Client) (*Test, error) {
 	}, nil
 }
 
+// Run executes a test against the defined WPT server
 func (t *Test) Run() error {
 	t.StatusChan = make(chan string)
 	// send the request to webpagetest
@@ -266,7 +272,7 @@ func (t *Test) setStatus(state string) {
 	t.Status = state
 }
 
-// this validates various options present against know valid inputs
+// Validate checks options present against know valid inputs
 func (tp *TestParams) Validate() error {
 	// check URL is set
 	if tp.URL == "" {
@@ -305,13 +311,17 @@ func (tp *TestParams) getQueryString() string {
 	return qs.Encode()
 }
 
+// Timestamp wrappes time.Time
 type Timestamp time.Time
 
+// MarshalJSON for Timestamp
 func (t Timestamp) MarshalJSON() ([]byte, error) {
 	ts := time.Time(t).Unix()
 	stamp := fmt.Sprint(ts)
 	return []byte(stamp), nil
 }
+
+// UnmarshalJSON for Timestamp
 func (t *Timestamp) UnmarshalJSON(b []byte) error {
 	pieces := strings.Split(string(b), ".")
 	ts, err := strconv.ParseInt(pieces[0], 10, 64)

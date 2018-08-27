@@ -50,14 +50,14 @@ var (
 	}
 )
 
-// setup the defaults for WebPageTest server and polling intervals
+// init setup the defaults for WebPageTest server and polling intervals
 func init() {
 	serverURL, _ = url.Parse(defaultBaseURL)
 	pollingInterval = 60 * time.Second
 	maximumMonitorPeriod = 1800 * time.Second // 30 minutes
 }
 
-// function to set your own private WebPageTest server url
+// SetURL sets your own private WebPageTest server url
 // this is validated and stored as a url.URL struct
 func SetURL(host string) error {
 	var err error
@@ -68,18 +68,19 @@ func SetURL(host string) error {
 	return nil
 }
 
-// function to overwrite the default 60 second polling interval for
-// checking test status.
+// SetPollingInterval allows for overwriting the default 60 second polling
+// interval for checking test status.
 func SetPollingInterval(period int64) {
 	pollingInterval = time.Duration(period) * time.Second
 }
 
-// function to overwrite the default 600 second maximum period to monitor
-// tests for status changes
+// SetMaximumMonitorPeriod allows overwriting the default 600 second
+// maximum period to monitor tests for status changes
 func SetMaximumMonitorPeriod(period int64) {
 	maximumMonitorPeriod = time.Duration(period) * time.Second
 }
 
+// Config represents persistent parameters to use for running tests
 type Config struct {
 	// Host specifies the host to send http requests to
 	Host string
@@ -92,6 +93,7 @@ type Config struct {
 	Debug bool
 }
 
+// Client is used for all connections to the WPT instance
 type Client struct {
 	// URL stores the Host and standard query params use for all
 	// requests to the WPT server
@@ -144,7 +146,7 @@ func (c *Client) Locations() (locations Locations, err error) {
 	return locations, nil
 }
 
-// Get the test results for a specific test ID.
+// GetResults retrieves the test results for a specific test ID.
 func (c *Client) GetResults(id string) (results TestResults, err error) {
 	qs := fmt.Sprintf("test=%s", id)
 	err = c.query(urlResults, qs, &results)
