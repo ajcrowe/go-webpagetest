@@ -3,6 +3,7 @@ go-webpagetest
 
 go-webpagetest is a simple library to interface with the [WebPageTest](http://www.webpagetest.org) RestAPI
 
+[![Build Status](https://travis-ci.org/ajcrowe/go-webpagetest.svg?branch=master)](https://travis-ci.org/ajcrowe/go-webpagetest)
 [![GoDoc](https://godoc.org/github.com/ajcrowe/go-webpagetest?status.svg)](https://godoc.org/github.com/ajcrowe/go-webpagetest)
 
 ## Features
@@ -38,3 +39,6 @@ import (
 
 You can find some examples in the `examples` folder for usage
 
+## Variable Name Changes
+
+A number of variables were renamed to correct casing such as `Id -> ID` and `Url -> URL` if you want to continuing using these please see the [`old-variable-name`](https://github.com/ajcrowe/go-webpagetest/tree/old-variable-name) branch
