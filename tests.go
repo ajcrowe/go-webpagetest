@@ -90,7 +90,7 @@ type TestRequest struct {
 		TestID     string `json:"testId"`
 		OwnerKey   string `json:"ownerKey"`
 		JSONURL    string `json:"jsonUrl"`
-		XMLUrl     string `json:"xmlUrl"`
+		XMLURL     string `json:"xmlUrl"`
 		UserURL    string `json:"userUrl"`
 		SummaryCSV string `json:"summaryCSV"`
 		DetailCSV  string `json:"detailCSV"`
@@ -180,7 +180,7 @@ func (t *Test) Run() error {
 	}
 
 	// update the Test struct
-	t.RequestID = t.Response.Data.TestId
+	t.RequestID = t.Response.Data.TestID
 	t.Status = testQueued
 
 	// call the monitor if set in test to update the Test
