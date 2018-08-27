@@ -39,6 +39,8 @@ type TestParams struct {
 	Block       []string `url:"-"`
 	BlockString string   `url:"block,omitempty"`
 
+	MobileDevice	string `url:"mobileDevice,omitempty"`
+	UAString			string `url:"uastring,omitempty"`
 	Login         string `url:"login,omitempty"`
 	Password      string `url:"password,omitempty"`
 	Notify        string `url:"notify,omitempty"`
