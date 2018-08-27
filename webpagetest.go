@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultBaseURL = "http://www.webpagetest.org"
+	defaultBaseURL = "https://www.webpagetest.org"
 	// Test status
 	testNew       = "new"
 	testFailed    = "failed"
@@ -90,6 +90,17 @@ type Config struct {
 	Timeout time.Duration
 	// Debug prints out all requests made to WPT.
 	Debug bool
+}
+
+// NewDefaultConfig returns a default configuratio for the client
+// all available settings are explicitly specified for clarity
+func NewDefaultConfig() Config {
+	return Config{
+		Host:    defaultBaseURL,
+		APIKey:  "",
+		Timeout: 60 * time.Second,
+		Debug:   false,
+	}
 }
 
 // Client is used for all connections to the WPT instance
