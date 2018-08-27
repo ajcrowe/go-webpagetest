@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	libraryVersion = "0.1"
 	defaultBaseURL = "http://www.webpagetest.org"
 	// Test status
 	testNew       = "new"
@@ -28,9 +27,9 @@ const (
 	// URL endpoints
 	urlLocations = "getLocations.php"
 	urlRunTest   = "runtest.php"
-	urlCancel    = "cancelTest.php"
 	urlStatus    = "testStatus.php"
 	urlResults   = "jsonResult.php"
+	// urlCancel    = "cancelTest.php" # todo
 )
 
 var (

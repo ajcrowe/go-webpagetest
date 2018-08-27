@@ -162,6 +162,7 @@ func NewTest(tp *TestParams, c *Client) (*Test, error) {
 		Client:  c,
 		Monitor: true,
 		Params:  tp,
+		Status:  testNew,
 	}, nil
 }
 
